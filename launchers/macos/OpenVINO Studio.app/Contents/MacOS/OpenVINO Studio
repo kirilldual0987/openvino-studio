@@ -1,7 +1,30 @@
 #!/bin/bash
 # OpenVINO Studio — macOS launcher. Copyright (c) 2026 ByKirilldual0987.
 set -u
-BASE="$(cd "$(dirname "$0")/../../.." && pwd)"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+# Find the project root by walking up from the .app bundle.
+BASE=""
+DIR="$HERE"
+for _ in 1 2 3 4 5 6 7 8; do
+  if [ -f "$DIR/app/bootstrap.pyw" ]; then BASE="$DIR"; break; fi
+  PARENT="$(dirname "$DIR")"
+  [ "$PARENT" = "$DIR" ] && break
+  DIR="$PARENT"
+done
+
+if [ -z "$BASE" ]; then
+  # Fallback: the app may sit next to the project folder.
+  for candidate in "$HERE/../../../../.." "$HOME/OpenVINO Studio" "/Applications/OpenVINO Studio"; do
+    if [ -f "$candidate/app/bootstrap.pyw" ]; then BASE="$(cd "$candidate" && pwd)"; break; fi
+  done
+fi
+
+if [ -z "$BASE" ]; then
+  osascript -e 'display alert "OpenVINO Studio" message "Не найдена папка приложения. Держите «OpenVINO Studio.app» внутри папки OpenVINO Studio или рядом с ней." as critical' >/dev/null 2>&1 || true
+  exit 1
+fi
+
 cd "$BASE" || exit 1
 mkdir -p "$BASE/runtime/logs"
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"

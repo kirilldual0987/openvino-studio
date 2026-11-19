@@ -50,8 +50,10 @@
 
 ### macOS
 
-1. Скачайте `OpenVINO-Studio-macOS.zip` и распакуйте.
-2. Запустите `OpenVINO Studio.app` (при первом запуске — правый клик → «Открыть»).
+1. Скачайте `OpenVINO-Studio-macOS.zip` и распакуйте целиком.
+2. Запустите `launchers/macos/OpenVINO Studio.app` (при первом запуске — правый клик → «Открыть»).
+   Не переносите один `.app` в «Программы»: рядом должна оставаться папка `app`.
+   Если macOS ругается на повреждение: `xattr -dr com.apple.quarantine "/путь/к/OpenVINO Studio/launchers/macos/OpenVINO Studio.app"`.
 3. Дальше — как в Windows.
 
 ### Linux
