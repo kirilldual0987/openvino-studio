@@ -858,7 +858,10 @@ export function settings(state) {
         <div class="setting-row"><span class="small muted">Python</span><span class="mono">${esc(system?.python || "—")}</span></div>
         <div class="setting-row"><span class="small muted">Платформа</span><span class="small">${esc(system?.platform || "—")} · ${esc(system?.arch || "")}</span></div>
         <div class="setting-row"><span class="small muted">OpenVINO</span><span class="mono">${esc(system?.openvino?.ov_version || "не установлен")}</span></div>
-        <div class="flex gap-8" style="flex-wrap:wrap"><a class="btn text small" href="https://docs.openvino.ai" target="_blank" rel="noopener">Документация ${icon("open_in_new", "xs")}</a><a class="btn text small" href="https://huggingface.co/OpenVINO" target="_blank" rel="noopener">Модели OpenVINO ${icon("open_in_new", "xs")}</a></div>
+        <div class="setting-row"><span class="small muted">Автор</span><strong>ByKirilldual0987</strong></div>
+        <div class="setting-row"><span class="small muted">Лицензия</span><span class="small">MIT</span></div>
+        <div class="flex gap-8" style="flex-wrap:wrap"><a class="btn text small" href="https://docs.openvino.ai" target="_blank" rel="noopener">Документация ${icon("open_in_new", "xs")}</a><a class="btn text small" href="https://huggingface.co/OpenVINO" target="_blank" rel="noopener">Модели OpenVINO ${icon("open_in_new", "xs")}</a><a class="btn text small" href="https://github.com/kirilldual0987/openvino-studio" target="_blank" rel="noopener">GitHub ${icon("open_in_new", "xs")}</a></div>
+        <p class="small muted" style="margin-top:12px">© 2026 ByKirilldual0987. OpenVINO и Intel — товарные знаки Intel Corporation. Проект не связан с Intel.</p>
       </div>
 
       <div class="card card-pad settings-card">
