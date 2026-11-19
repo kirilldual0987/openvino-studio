@@ -205,7 +205,7 @@ def open_app_window(url: str) -> None:
 
 
 class StudioHandler(BaseHTTPRequestHandler):
-    server_version = "OpenVINOStudio/1.0"
+    server_version = f"OpenVINOStudio/{config.APP_VERSION}"
     protocol_version = "HTTP/1.1"
 
     # ---------------------------------------------------------------- helpers

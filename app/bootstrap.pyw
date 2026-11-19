@@ -77,6 +77,24 @@ def show_error(message: str) -> None:
             ctypes.windll.user32.MessageBoxW(0, full, "OpenVINO Studio", 0x10)
         except Exception:
             pass
+    elif sys.platform == "darwin":
+        try:
+            import json
+
+            script = 'display alert "OpenVINO Studio" message ' + json.dumps(full) + " as critical"
+            subprocess.run(["osascript", "-e", script], timeout=30, **hidden_kwargs())
+        except Exception:
+            pass
+    else:
+        for cmd in (
+            ["zenity", "--error", "--title=OpenVINO Studio", "--text=" + full],
+            ["kdialog", "--title", "OpenVINO Studio", "--error", full],
+        ):
+            try:
+                subprocess.run(cmd, timeout=30, **hidden_kwargs())
+                break
+            except Exception:
+                continue
 
 
 class Splash:

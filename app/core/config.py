@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 APP_NAME = "OpenVINO Studio"
-APP_VERSION = "1.1.2"
+APP_VERSION = "1.1.3"
 APP_TAGLINE = "Локальный AI на Intel"
 
 BASE_DIR = Path(__file__).resolve().parents[2]
