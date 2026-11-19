@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenVINO Studio — локальный ИИ без терминала</title>
+<meta name="description" content="OpenVINO Studio — настольное приложение для запуска моделей на OpenVINO: чат с LLM, VLM, изображения, бенчмарк и конвертация. Без терминала. Windows, macOS, Linux.">
+<meta property="og:title" content="OpenVINO Studio">
+<meta property="og:description" content="Локальный ИИ на вашем ПК. Без облака и терминала.">
+<meta property="og:image" content="assets/overview.png">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      <span>OpenVINO Studio</span>
+    </a>
+    <nav class="nav">
+      <a href="#features">Возможности</a>
+      <a href="#screens">Скриншоты</a>
+      <a href="#start">Быстрый старт</a>
+      <a href="#download">Скачать</a>
+    </nav>
+    <a class="btn filled" href="https://github.com/kirilldual0987/openvino-studio/releases/latest">Релизы</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <span class="chip">OpenVINO 2026 · Material Design 3</span>
+      <h1>Модели работают на вашем ПК.<br>Без облака и терминала.</h1>
+      <p class="lead">Готовое приложение для Windows, macOS и Linux: скачивайте модели с Hugging Face, общайтесь с LLM, анализируйте изображения, запускайте VLM, измеряйте скорость и конвертируйте свои модели в OpenVINO IR.</p>
+      <div class="hero-actions">
+        <a class="btn filled" href="https://github.com/kirilldual0987/openvino-studio/releases/latest">Скачать последнюю версию</a>
+        <a class="btn outlined" href="https://github.com/kirilldual0987/openvino-studio">Исходный код</a>
+      </div>
+      <ul class="hero-facts">
+        <li>Никаких команд в консоли</li>
+        <li>Данные остаются на диске</li>
+        <li>CPU, GPU и NPU Intel</li>
+      </ul>
+    </div>
+    <div class="hero-art">
+      <img src="assets/overview.png" alt="Обзор OpenVINO Studio" loading="lazy">
+    </div>
+  </section>
+
+  <section class="wrap features" id="features">
+    <h2>Что внутри</h2>
+    <p class="section-lead">Полный цикл работы с локальными моделями в одном окне.</p>
+    <div class="grid">
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg></div>
+        <h3>Чат с LLM</h3>
+        <p>Потоковые ответы, температура, top-p, системная инструкция, остановка генерации и история диалога.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
+        <h3>VLM и изображения</h3>
+        <p>Загрузите картинку и задайте вопрос модели. Плюс YOLO-детекция и классификация ResNet/MobileNet.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
+        <h3>Скачивание моделей</h3>
+        <p>Каталог проверенных моделей и поиск по Hugging Face. Прогресс, ETA, докачка и отмена.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z"/></svg></div>
+        <h3>Бенчмарк</h3>
+        <p>Latency, throughput, TTFT и история замеров. Сравнение устройств и форматов.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M21 11h-2V6.83l-2.29 2.29-1.42-1.42L17.59 5H13V3h8v8zM3 13h2v4.17l2.29-2.29 1.42 1.42L6.41 19H11v2H3v-8z"/></svg></div>
+        <h3>Конвертация</h3>
+        <p>Hugging Face → OpenVINO IR в INT4, INT8 или FP16 через Optimum Intel, без ручных команд.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M13 2.05V12h5l-7 9.95V12H7l6-9.95z"/></svg></div>
+        <h3>Всё локально</h3>
+        <p>Модели, кэш, окружение и журналы — на вашем диске. Приложение не отправляет данные в облако.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap screens" id="screens">
+    <h2>Как это выглядит</h2>
+    <p class="section-lead">Спокойный интерфейс в духе Material Design 3, без градиентов и визуального шума.</p>
+    <div class="screen-grid">
+      <figure class="screen">
+        <img src="assets/chat.png" alt="Чат с локальной моделью" loading="lazy">
+        <figcaption>Чат с потоковым ответом</figcaption>
+      </figure>
+      <figure class="screen">
+        <img src="assets/vlm.png" alt="Анализ изображения" loading="lazy">
+        <figcaption>VLM: вопрос по картинке</figcaption>
+      </figure>
+      <figure class="screen">
+        <img src="assets/models.png" alt="Каталог моделей" loading="lazy">
+        <figcaption>Каталог моделей</figcaption>
+      </figure>
+      <figure class="screen">
+        <img src="assets/images.png" alt="Классификация изображений" loading="lazy">
+        <figcaption>Классификация и детекция</figcaption>
+      </figure>
+      <figure class="screen">
+        <img src="assets/benchmark.png" alt="Бенчмарк" loading="lazy">
+        <figcaption>Замеры производительности</figcaption>
+      </figure>
+      <figure class="screen">
+        <img src="assets/tools.png" alt="Инструменты" loading="lazy">
+        <figcaption>Компоненты и конвертация</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap start" id="start">
+    <h2>Быстрый старт</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div>
+          <h3>Скачайте архив</h3>
+          <p>Выберите сборку для своей системы на странице релизов и распакуйте в любую папку.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div>
+          <h3>Запустите приложение</h3>
+          <p>Windows: <code>OpenVINO Studio.vbs</code>. macOS: <code>OpenVINO Studio.app</code>. Linux: <code>start-openvino-studio.sh</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div>
+          <h3>Установите компоненты</h3>
+          <p>В разделе «Инструменты» → «Компоненты» поставьте OpenVINO Runtime и GenAI. Всё ставится в отдельное окружение рядом с приложением.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div>
+          <h3>Скачайте модель и работайте</h3>
+          <p>Откройте «Модели», выберите модель и нажмите «Скачать». Дальше — «Чат», «VLM», «Изображения» или «Бенчмарк».</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <strong>Требования:</strong> Python 3.10–3.14, Windows 10/11, macOS 12+ или Linux x86_64. Для больших моделей нужно 8–16 ГБ ОЗУ и свободное место на диске.
+    </div>
+  </section>
+
+  <section class="wrap download" id="download">
+    <div class="download-card">
+      <div>
+        <h2>Скачать OpenVINO Studio</h2>
+        <p>Бесплатно, с открытым исходным кодом. Сборки для Windows, macOS и Linux публикуются в GitHub Releases.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn filled" href="https://github.com/kirilldual0987/openvino-studio/releases/latest">Перейти к релизам</a>
+        <a class="btn outlined" href="https://github.com/kirilldual0987/openvino-studio">GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <img src="assets/logo.svg" alt="" width="28" height="28">
+      <div>
+        <strong>OpenVINO Studio</strong>
+        <p>© 2026 ByKirilldual0987. Лицензия MIT.</p>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/kirilldual0987/openvino-studio">Репозиторий</a>
+      <a href="https://github.com/kirilldual0987/openvino-studio/blob/main/LICENSE">Лицензия</a>
+      <a href="https://github.com/kirilldual0987/openvino-studio/issues">Проблемы</a>
+    </div>
+  </div>
+  <div class="wrap trademark">
+    OpenVINO и Intel являются товарными знаками Intel Corporation. Проект не связан с Intel и не спонсируется ею.
+  </div>
+</footer>
+</body>
+</html>

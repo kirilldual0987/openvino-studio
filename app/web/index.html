@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#FBF8FF">
+  <title>OpenVINO Studio</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/Roboto-Variable.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    try {
+      var savedTheme = localStorage.getItem("ovs-theme") || "system";
+      var dark = savedTheme === "dark" || (savedTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="rail" aria-label="Основная навигация">
+      <a class="brand" href="#/overview" aria-label="OpenVINO Studio">
+        <img src="assets/logo.svg" alt="" width="48" height="48">
+      </a>
+      <nav class="rail-nav" id="rail-nav">
+        <a class="rail-item" href="#/overview" data-route="overview">
+          <span class="rail-indicator"><span class="ms">space_dashboard</span></span>
+          <span class="rail-label">Обзор</span>
+        </a>
+        <a class="rail-item" href="#/models" data-route="models">
+          <span class="rail-indicator"><span class="ms">travel_explore</span></span>
+          <span class="rail-label">Модели</span>
+        </a>
+        <a class="rail-item" href="#/library" data-route="library">
+          <span class="rail-indicator"><span class="ms">inventory_2</span></span>
+          <span class="rail-label">Библиотека</span>
+        </a>
+        <a class="rail-item" href="#/chat" data-route="chat">
+          <span class="rail-indicator"><span class="ms">forum</span></span>
+          <span class="rail-label">Чат</span>
+        </a>
+        <a class="rail-item" href="#/vlm" data-route="vlm">
+          <span class="rail-indicator"><span class="ms">visibility</span></span>
+          <span class="rail-label">VLM</span>
+        </a>
+        <a class="rail-item" href="#/images" data-route="images">
+          <span class="rail-indicator"><span class="ms">image</span></span>
+          <span class="rail-label">Изображения</span>
+        </a>
+        <a class="rail-item" href="#/benchmark" data-route="benchmark">
+          <span class="rail-indicator"><span class="ms">speed</span></span>
+          <span class="rail-label">Бенчмарк</span>
+        </a>
+        <a class="rail-item" href="#/tools" data-route="tools">
+          <span class="rail-indicator"><span class="ms">build</span></span>
+          <span class="rail-label">Инструменты</span>
+        </a>
+        <a class="rail-item" href="#/settings" data-route="settings">
+          <span class="rail-indicator"><span class="ms">settings</span></span>
+          <span class="rail-label">Настройки</span>
+        </a>
+        <button class="rail-item rail-more" type="button" data-action="mobile-more" aria-label="Ещё разделы">
+          <span class="rail-indicator"><span class="ms">more_horiz</span></span>
+          <span class="rail-label">Ещё</span>
+        </button>
+      </nav>
+      <div class="rail-footer">
+        <div class="rail-status" id="rail-status" title="Состояние окружения">
+          <span class="status-dot"></span>
+          <span>v1.0</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <div class="topbar-title">
+          <span class="eyebrow">OpenVINO Studio</span>
+          <h1 id="page-title">Обзор</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="engine-chip" id="engine-chip" type="button" data-action="goto-tools">
+            <span class="status-dot"></span>
+            <span id="engine-label">Проверка окружения…</span>
+          </button>
+          <button class="icon-btn" id="theme-button" type="button" data-action="cycle-theme" title="Сменить тему" aria-label="Сменить тему">
+            <span class="ms">contrast</span>
+          </button>
+          <button class="icon-btn badge-host" id="jobs-button" type="button" data-action="toggle-dock" title="Задачи" aria-label="Задачи">
+            <span class="ms">progress_activity</span>
+            <span class="badge" id="jobs-badge" hidden>0</span>
+          </button>
+          <button class="icon-btn" id="refresh-button" type="button" data-action="refresh-page" title="Обновить" aria-label="Обновить">
+            <span class="ms">refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="view" class="view" aria-live="polite">
+        <div class="boot-screen">
+          <img src="assets/logo.svg" alt="" width="56" height="56">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Запускаем OpenVINO Studio…</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="job-dock" id="job-dock" hidden>
+    <div class="job-dock-head">
+      <div>
+        <span class="job-dock-title">Задачи</span>
+        <span class="job-dock-count" id="job-dock-count"></span>
+      </div>
+      <button class="icon-btn small" type="button" data-action="toggle-dock" aria-label="Свернуть задачи">
+        <span class="ms" id="dock-chevron">expand_more</span>
+      </button>
+    </div>
+    <div class="job-dock-body" id="job-dock-body"></div>
+  </div>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <dialog id="sheet" class="sheet-dialog"></dialog>
+  <dialog id="modal" class="modal-dialog"></dialog>
+
+  <input type="file" id="image-file" accept="image/*" hidden>
+  <input type="file" id="vlm-file" accept="image/*" hidden>
+  <form id="dummy-form" hidden></form>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

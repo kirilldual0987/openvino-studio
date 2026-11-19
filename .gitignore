@@ -1,0 +1,24 @@
+# Runtime data — created on the user's machine
+runtime/
+models/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# OS junk
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Local test artifacts
+*.log

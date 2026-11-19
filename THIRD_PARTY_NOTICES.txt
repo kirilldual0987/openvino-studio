@@ -1,0 +1,26 @@
+OpenVINO Studio 1.0 — сторонние компоненты
+==========================================
+
+Шрифты
+------
+Roboto (Apache License 2.0)
+https://fonts.google.com/specimen/Roboto
+https://www.apache.org/licenses/LICENSE-2.0
+
+Material Symbols Rounded (Apache License 2.0)
+https://fonts.google.com/icons
+https://www.apache.org/licenses/LICENSE-2.0
+
+Сертификаты
+-----------
+cacert.pem из проекта certifi (Mozilla Public License 2.0)
+https://github.com/certifi/python-certifi
+https://www.mozilla.org/media/MPL/2.0/index.txt
+
+Python-пакеты устанавливаются отдельно по запросу пользователя:
+OpenVINO, OpenVINO GenAI, Optimum Intel, NNCF, PyTorch, Transformers,
+Pillow, NumPy. Каждый пакет распространяется под собственной лицензией;
+смотрите метаданные пакета на PyPI.
+
+Модели Hugging Face имеют собственные лицензии. Проверяйте лицензию на
+странице модели перед использованием, особенно в коммерческих проектах.
