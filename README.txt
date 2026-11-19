@@ -1,4 +1,4 @@
-﻿OpenVINO Studio 1.1.5
+﻿OpenVINO Studio 1.1.6
 =====================
 
 Локальный AI-интерфейс для Intel OpenVINO на Windows.
@@ -118,4 +118,4 @@ Windows предупреждает о запуске .vbs.
 ------------------
 OpenVINO Runtime + GenAI + Optimum Intel. Интерфейс — локальный веб-сервер
 на Python и собственное окно Qt WebEngine (Chromium). Материал Design 3, без градиентов.
-Версия 1.1.5.
+Версия 1.1.6.

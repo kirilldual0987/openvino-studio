@@ -466,7 +466,7 @@ def open_window(python: Path, url: str, backends: list[str], splash: "Splash | N
         log(f"launching {backend} window: {script} {url}")
         try:
             proc = subprocess.Popen(
-                [str(python), str(script), url],
+                [str(console_python(python)), str(script), url],
                 cwd=str(BASE),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

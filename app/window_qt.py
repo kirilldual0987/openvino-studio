@@ -130,7 +130,7 @@ def main() -> int:
 
         def on_title(self, title: str) -> None:
             if title:
-                self.setWindowTitle(f"{title} — OpenVINO Studio")
+                self.setWindowTitle(title if "OpenVINO Studio" in title else f"{title} — OpenVINO Studio")
 
         def on_loaded(self, ok: bool) -> None:
             log(f"page load finished: {ok}")
