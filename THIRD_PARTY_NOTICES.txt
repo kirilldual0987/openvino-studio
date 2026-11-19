@@ -17,6 +17,12 @@ cacert.pem из проекта certifi (Mozilla Public License 2.0)
 https://github.com/certifi/python-certifi
 https://www.mozilla.org/media/MPL/2.0/index.txt
 
+PySide6 / Qt WebEngine (LGPLv3)
+https://www.qt.io/qt-for-python
+https://www.gnu.org/licenses/lgpl-3.0.html
+Устанавливается автоматически при первом запуске как отдельный пакет;
+его можно заменить или удалить, не изменяя код OpenVINO Studio.
+
 Python-пакеты устанавливаются отдельно по запросу пользователя:
 OpenVINO, OpenVINO GenAI, Optimum Intel, NNCF, PyTorch, Transformers,
 Pillow, NumPy. Каждый пакет распространяется под собственной лицензией;

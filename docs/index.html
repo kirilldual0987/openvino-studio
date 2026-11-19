@@ -33,7 +33,7 @@
   <section class="hero wrap">
     <div class="hero-copy">
       <h1>Модели работают на вашем ПК.<br>Без облака и терминала.</h1>
-      <p class="lead">Чат, анализ изображений, бенчмарк и конвертация — в одном окне. Модели скачиваются с Hugging Face и работают локально.</p>
+      <p class="lead">Чат, анализ изображений, бенчмарк и конвертация — в одном встроенном окне. Модели скачиваются с Hugging Face и работают локально.</p>
       <div class="hero-actions">
         <a class="btn filled" href="https://github.com/kirilldual0987/openvino-studio/releases/latest">Скачать последнюю версию</a>
         <a class="btn outlined" href="https://github.com/kirilldual0987/openvino-studio">Исходный код</a>
@@ -78,9 +78,9 @@
         <p>Hugging Face → OpenVINO IR: INT4, INT8, FP16.</p>
       </article>
       <article class="card">
-        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M13 2.05V12h5l-7 9.95V12H7l6-9.95z"/></svg></div>
-        <h3>Всё локально</h3>
-        <p>Модели, кэш и журналы — на вашем диске.</p>
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg></div>
+        <h3>Встроенное окно</h3>
+        <p>Qt WebEngine (Chromium). Своё окно, без браузера и вкладок.</p>
       </article>
     </div>
   </section>
@@ -130,7 +130,7 @@
         <span class="step-num">2</span>
         <div>
           <h3>Запустите приложение</h3>
-          <p>Windows — <code>OpenVINO Studio.vbs</code>, macOS — <code>OpenVINO Studio.app</code>, Linux — <code>start-openvino-studio.sh</code>.</p>
+          <p>Windows — <code>OpenVINO Studio.vbs</code>, macOS — <code>OpenVINO Studio.app</code>, Linux — <code>start-openvino-studio.sh</code>. Откроется встроенное окно на Qt WebEngine; при сбое — адрес и журнал.</p>
         </div>
       </div>
       <div class="step">
@@ -149,18 +149,18 @@
       </div>
     </div>
     <div class="note">
-      <strong>Требования:</strong> Python 3.10–3.14; Windows 10/11, macOS 12+ или Linux x86_64. Для больших моделей — 8–16 ГБ ОЗУ.
+      <strong>Требования:</strong> Python 3.10–3.14; Windows 10/11, macOS 12+, Linux x86_64 с графической средой. PySide6 (~500 МБ) ставится при первом запуске. Для больших моделей — 8–16 ГБ ОЗУ.
     </div>
   </section>
 
   <section class="wrap changes" id="changes">
     <h2>Что нового</h2>
-    <p class="section-lead">Версия 1.1.3 — исправления запуска и сборок.</p>
+    <p class="section-lead">Версия 1.1.5 — собственный Chromium-движок в окне приложения.</p>
     <ul class="change-list">
-      <li><strong>Windows:</strong> лончер корректно запускает приложение из папки с пробелами.</li>
-      <li><strong>macOS:</strong> приложение само находит папку проекта, а не ищет её по фиксированному пути.</li>
-      <li><strong>Сервер:</strong> версия в ответах API берётся из конфигурации.</li>
-      <li><strong>Архивы:</strong> убраны служебные файлы macOS.</li>
+      <li><strong>Встроенное окно:</strong> Qt WebEngine (Chromium) на Windows, macOS и Linux — браузер не нужен.</li>
+      <li><strong>Надёжность:</strong> если движок недоступен, приложение покажет адрес и журнал, не открывая браузер.</li>
+      <li><strong>Windows:</strong> исправлен запуск из папки с пробелами и проверка Python.</li>
+      <li><strong>Закрытие:</strong> окно закрывается — локальный сервер останавливается.</li>
     </ul>
   </section>
 
@@ -168,7 +168,7 @@
     <div class="download-card">
       <div>
         <h2>Скачать OpenVINO Studio</h2>
-        <p>Версия 1.1.3. Открытый код, лицензия MIT. Сборки для Windows, macOS и Linux — в GitHub Releases.</p>
+        <p>Версия 1.1.5. Открытый код, лицензия MIT. Сборки для Windows, macOS и Linux — в GitHub Releases.</p>
       </div>
       <div class="download-actions">
         <a class="btn filled" href="https://github.com/kirilldual0987/openvino-studio/releases/latest">Перейти к релизам</a>

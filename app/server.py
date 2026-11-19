@@ -167,8 +167,8 @@ def open_folder(path: Path) -> None:
         subprocess.Popen(["xdg-open", str(path)])
 
 
-def open_app_window(url: str) -> None:
-    """Open a chromeless app window when Edge/Chrome is available."""
+def open_app_window(url: str) -> bool:
+    """Try a chromeless Edge/Chrome app window. Returns True if a process was launched."""
     if config.IS_WINDOWS:
         local = os.environ.get("LOCALAPPDATA", "")
         pf = os.environ.get("ProgramFiles", r"C:\Program Files")
@@ -195,13 +195,106 @@ def open_app_window(url: str) -> None:
                         ],
                         close_fds=True,
                     )
-                    return
+                    log(f"browser app window launched: {exe}")
+                    return True
                 except Exception as exc:
-                    log(f"browser start failed: {exc}")
+                    log(f"browser start failed ({exe}): {exc}")
+    return False
+
+
+def open_default_browser(url: str) -> bool:
+    """Open the URL in the user's default browser. Returns True if the call succeeded."""
     try:
-        webbrowser.open(url)
+        if config.IS_WINDOWS:
+            os.startfile(url)  # type: ignore[attr-defined]
+            log(f"default browser opened: {url}")
+            return True
+        if config.IS_MAC:
+            subprocess.Popen(["open", url], close_fds=True)
+            log(f"default browser opened: {url}")
+            return True
+        subprocess.Popen(["xdg-open", url], close_fds=True)
+        log(f"xdg-open: {url}")
+        return True
+    except Exception as first_error:
+        log(f"default browser failed: {first_error}")
+    try:
+        if webbrowser.open(url):
+            log(f"webbrowser opened: {url}")
+            return True
     except Exception as exc:
         log(f"webbrowser failed: {exc}")
+    return False
+
+
+def write_browser_shortcut(url: str) -> None:
+    """Leave a clickable shortcut in runtime/ in case automatic opening failed."""
+    try:
+        path = config.RUNTIME_DIR / "open-in-browser.url"
+        path.write_text(f"[InternetShortcut]\nURL={url}\n", encoding="utf-8")
+    except Exception:
+        pass
+
+
+def browser_hint(url: str) -> None:
+    message = (
+        "OpenVINO Studio запущен, но браузер не открылся автоматически.\n\n"
+        f"Откройте вручную:\n{url}\n\n"
+        "Ссылка также сохранена в runtime\\open-in-browser.url"
+    )
+    log(message)
+    write_browser_shortcut(url)
+    try:
+        if config.IS_WINDOWS:
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(0, message, "OpenVINO Studio", 0x40)
+            return
+        if config.IS_MAC:
+            import json
+
+            script = 'display alert "OpenVINO Studio" message ' + json.dumps(message)
+            subprocess.run(["osascript", "-e", script], timeout=60)
+            return
+        for cmd in (
+            ["zenity", "--info", "--title=OpenVINO Studio", "--text=" + message],
+            ["kdialog", "--title", "OpenVINO Studio", "--msgbox", message],
+        ):
+            try:
+                subprocess.run(cmd, timeout=60)
+                return
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+
+def launch_ui(server, url: str) -> None:
+    """Open the UI and verify that a browser actually connected to the server."""
+    mode = (config.load_settings().get("open_mode") or "app").lower()
+    write_browser_shortcut(url)
+    if os.environ.get("OVS_NO_BROWSER"):
+        log("automatic browser opening disabled by OVS_NO_BROWSER")
+        return
+    launched = False
+    if mode != "browser":
+        launched = open_app_window(url)
+    if not launched:
+        launched = open_default_browser(url)
+    if launched:
+        for _ in range(40):
+            if getattr(server, "browser_seen", False):
+                log("browser connected")
+                return
+            time.sleep(0.2)
+        log("browser did not connect in 8 seconds, trying default browser again")
+        open_default_browser(url)
+        for _ in range(25):
+            if getattr(server, "browser_seen", False):
+                log("default browser connected")
+                return
+            time.sleep(0.2)
+    browser_hint(url)
 
 
 class StudioHandler(BaseHTTPRequestHandler):
@@ -301,6 +394,7 @@ class StudioHandler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if not path.startswith("/api/"):
+            self.server.browser_seen = True  # type: ignore[attr-defined]
             self._serve_static(path)
             return
         try:
@@ -930,6 +1024,7 @@ class StudioServer(ThreadingHTTPServer):
         self.jobs = jobs
         self.last_activity = time.time()
         self.started_at = time.time()
+        self.browser_seen = False
 
 
 def port_available(port: int) -> bool:
@@ -997,7 +1092,8 @@ def main() -> int:
             url = f"http://127.0.0.1:{running['port']}/"
             log(f"already running: {url}")
             if not args.no_open:
-                open_app_window(url)
+                if not open_app_window(url):
+                    open_default_browser(url)
             return 0
 
     jobs = JobManager(on_finished=on_job_finished)
@@ -1042,7 +1138,7 @@ def main() -> int:
     stop_event = threading.Event()
     threading.Thread(target=watchdog, args=(server, stop_event), daemon=True).start()
     if not args.no_open:
-        threading.Timer(0.5, lambda: open_app_window(url)).start()
+        threading.Thread(target=lambda: (time.sleep(0.4), launch_ui(server, url)), daemon=True).start()
 
     def _stop(_signum=None, _frame=None):
         stop_event.set()

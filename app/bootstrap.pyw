@@ -5,8 +5,10 @@ UI server. There is no console: the window below appears only on the first run.
 """
 from __future__ import annotations
 
+import json
 import os
 import subprocess
+import urllib.request
 import sys
 import time
 import traceback
@@ -40,6 +42,16 @@ def hidden_kwargs() -> dict:
     info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     info.wShowWindow = 0
     return {"startupinfo": info, "creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)}
+
+
+def console_python(exe: Path | None = None) -> Path:
+    """pythonw.exe cannot always report pip errors; use python.exe for setup."""
+    exe = Path(exe or sys.executable)
+    if IS_WINDOWS and exe.name.lower() == "pythonw.exe":
+        candidate = exe.with_name("python.exe")
+        if candidate.exists():
+            return candidate
+    return exe
 
 
 def venv_python() -> Path:
@@ -156,7 +168,7 @@ class Splash:
         self.progress = 0.05
         self.hint = tk.Label(
             self.root,
-            text="Это займёт несколько секунд. Терминал не нужен.",
+            text="Первый запуск: скачиваем движок окна. Это может занять несколько минут.",
             bg="#121318",
             fg="#90909a",
             font=("Segoe UI", 9) if IS_WINDOWS else ("Helvetica Neue", 9),
@@ -189,8 +201,9 @@ def ensure_venv(splash: Splash | None = None) -> Path:
     RUNTIME.mkdir(parents=True, exist_ok=True)
     if splash:
         splash.update("Создаём изолированное окружение…", 0.2)
-    log(f"creating venv at {VENV} with {sys.executable}")
-    command = [sys.executable, "-m", "venv", "--copies", str(VENV)]
+    setup_python = console_python()
+    log(f"creating venv at {VENV} with {setup_python}")
+    command = [str(setup_python), "-m", "venv", "--copies", str(VENV)]
     proc = subprocess.run(
         command,
         capture_output=True,
@@ -207,8 +220,9 @@ def ensure_venv(splash: Splash | None = None) -> Path:
     python = venv_python()
     if splash:
         splash.update("Проверяем pip…", 0.55)
+    pip_python = console_python(python)
     check = subprocess.run(
-        [str(python), "-m", "pip", "--version"],
+        [str(pip_python), "-m", "pip", "--version"],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -218,7 +232,7 @@ def ensure_venv(splash: Splash | None = None) -> Path:
     )
     if check.returncode != 0:
         subprocess.run(
-            [str(python), "-m", "ensurepip", "--upgrade"],
+            [str(pip_python), "-m", "ensurepip", "--upgrade"],
             capture_output=True,
             timeout=180,
             **hidden_kwargs(),
@@ -236,7 +250,7 @@ def start_server(python: Path) -> None:
     log(f"starting server: {python} {server}")
     kwargs = hidden_kwargs()
     proc = subprocess.Popen(
-        [str(python), str(server)],
+        [str(python), str(server), "--no-open"],
         cwd=str(BASE),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -256,6 +270,226 @@ def start_server(python: Path) -> None:
         except Exception:
             pass
         raise RuntimeError("Сервер не запустился." + (("\n" + tail) if tail else ""))
+
+
+def wait_for_url(timeout: float = 30.0) -> str:
+    """Wait until the local server answers and return its URL."""
+    info = RUNTIME / "server.json"
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            data = json.loads(info.read_text(encoding="utf-8"))
+            port = int(data.get("port"))
+            url = f"http://127.0.0.1:{port}/"
+            with urllib.request.urlopen(url + "api/ping", timeout=1.0) as response:
+                if response.status == 200:
+                    return url
+        except Exception:
+            pass
+        time.sleep(0.4)
+    return ""
+
+
+def _probe(python: Path, code: str, timeout: int = 90) -> bool:
+    try:
+        proc = subprocess.run(
+            [str(console_python(python)), "-c", code],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            **hidden_kwargs(),
+        )
+        return proc.returncode == 0
+    except Exception:
+        return False
+
+
+def _pip_install(python: Path, package: str, timeout: int = 1200) -> bool:
+    env = os.environ.copy()
+    env["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+    env["PIP_NO_INPUT"] = "1"
+    env["PIP_CACHE_DIR"] = str(RUNTIME / "pip-cache")
+    env["TMP"] = str(RUNTIME / "tmp")
+    env["TEMP"] = str(RUNTIME / "tmp")
+    env["TMPDIR"] = str(RUNTIME / "tmp")
+    try:
+        proc = subprocess.run(
+            [
+                str(console_python(python)),
+                "-m",
+                "pip",
+                "install",
+                "--disable-pip-version-check",
+                "--no-input",
+                "--no-warn-script-location",
+                package,
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+            env=env,
+            **hidden_kwargs(),
+        )
+        log(f"pip install {package} exit={proc.returncode}\n{proc.stdout[-3000:]}\n{proc.stderr[-1500:]}")
+        return proc.returncode == 0
+    except Exception as exc:
+        log(f"pip install {package} failed: {exc}")
+        return False
+
+
+def ensure_embedded(python: Path, splash: "Splash | None" = None) -> list[str]:
+    """Install and return the available embedded browser backends, best first."""
+    backends: list[str] = []
+    qt_probe = "from PySide6.QtWebEngineWidgets import QWebEngineView"
+    if _probe(python, qt_probe, timeout=120):
+        backends.append("qt")
+    else:
+        log("PySide6 WebEngine is missing, installing…")
+        if splash:
+            splash.update("Устанавливаем встроенный браузер (≈500 МБ)…", 0.68)
+        install_env = os.environ.copy()
+        install_env["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+        install_env["PIP_NO_INPUT"] = "1"
+        install_env["PIP_CACHE_DIR"] = str(RUNTIME / "pip-cache")
+        install_env["TMP"] = str(RUNTIME / "tmp")
+        install_env["TEMP"] = str(RUNTIME / "tmp")
+        install_env["TMPDIR"] = str(RUNTIME / "tmp")
+        try:
+            proc = subprocess.run(
+                [
+                    str(console_python(python)),
+                    "-m",
+                    "pip",
+                    "install",
+                    "--disable-pip-version-check",
+                    "--no-input",
+                    "--no-warn-script-location",
+                    "PySide6",
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=1800,
+                env=install_env,
+                **hidden_kwargs(),
+            )
+            log(f"PySide6 install exit={proc.returncode}\n{proc.stdout[-4000:]}\n{proc.stderr[-2000:]}")
+        except Exception as exc:
+            log(f"PySide6 install failed: {exc}")
+        if _probe(python, qt_probe, timeout=180):
+            backends.append("qt")
+
+    if _probe(python, "import webview", timeout=90):
+        backends.append("pywebview")
+    elif not backends:
+        log("pywebview is missing, installing as fallback…")
+        if splash:
+            splash.update("Устанавливаем запасное окно…", 0.78)
+        _pip_install(python, "pywebview", timeout=600)
+        if _probe(python, "import webview", timeout=90):
+            backends.append("pywebview")
+    return backends
+
+
+def open_browser(url: str) -> bool:
+    log(f"fallback browser: {url}")
+    try:
+        if IS_WINDOWS:
+            os.startfile(url)  # type: ignore[attr-defined]
+            return True
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", url], close_fds=True)
+            return True
+        subprocess.Popen(["xdg-open", url], close_fds=True)
+        return True
+    except Exception as exc:
+        log(f"fallback browser failed: {exc}")
+        return False
+
+
+def browser_hint(url: str) -> None:
+    message = (
+        "OpenVINO Studio запущен, но встроенное окно не открылось.\n\n"
+        f"Откройте вручную:\n{url}\n\n"
+        "Ссылка сохранена в runtime\\open-in-browser.url"
+    )
+    log(message)
+    try:
+        (RUNTIME / "open-in-browser.url").write_text(
+            f"[InternetShortcut]\nURL={url}\n", encoding="utf-8"
+        )
+    except Exception:
+        pass
+    try:
+        if IS_WINDOWS:
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(0, message, "OpenVINO Studio", 0x40)
+        elif sys.platform == "darwin":
+            import json as _json
+
+            subprocess.run(
+                ["osascript", "-e", 'display alert "OpenVINO Studio" message ' + _json.dumps(message)],
+                timeout=60,
+            )
+        else:
+            subprocess.run(["zenity", "--info", "--title=OpenVINO Studio", "--text=" + message], timeout=60)
+    except Exception:
+        pass
+
+
+def _wait_ready(proc, ready: Path, timeout: float = 40.0) -> bool:
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if ready.exists():
+            return True
+        if proc.poll() is not None:
+            log(f"window process exited with code {proc.poll()}")
+            return False
+        time.sleep(0.35)
+    return False
+
+
+def open_window(python: Path, url: str, backends: list[str], splash: "Splash | None" = None) -> bool:
+    ready = RUNTIME / "window.ready"
+    for backend in backends:
+        script = APP / ("window_qt.py" if backend == "qt" else "window.py")
+        if not script.exists():
+            continue
+        try:
+            ready.unlink(missing_ok=True)
+        except OSError:
+            pass
+        log(f"launching {backend} window: {script} {url}")
+        try:
+            proc = subprocess.Popen(
+                [str(python), str(script), url],
+                cwd=str(BASE),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                close_fds=True,
+                **hidden_kwargs(),
+            )
+        except Exception as exc:
+            log(f"{backend} process failed: {exc}")
+            continue
+        if _wait_ready(proc, ready, timeout=40.0):
+            log(f"{backend} window ready")
+            return True
+        log(f"{backend} window failed, trying next backend")
+        try:
+            if proc.poll() is None:
+                proc.terminate()
+                time.sleep(0.3)
+                if proc.poll() is None:
+                    proc.kill()
+        except Exception:
+            pass
+    return False
 
 
 def main() -> None:
@@ -279,9 +513,19 @@ def main() -> None:
                 log(f"splash unavailable: {exc}")
                 splash = None
         python = ensure_venv(splash)
+        backends = ensure_embedded(python, splash)
+        log(f"embedded backends: {backends}")
         if splash:
             splash.update("Запускаем интерфейс…", 0.9)
         start_server(python)
+        url = wait_for_url()
+        if not url:
+            raise RuntimeError("Сервер не ответил. Смотрите runtime\\logs\\studio.log.")
+        if splash:
+            splash.update("Открываем окно…", 0.96)
+        if not open_window(python, url, backends, splash):
+            log("embedded window unavailable")
+            browser_hint(url)
         if splash:
             splash.update("Готово", 1.0)
             time.sleep(0.3)

@@ -9,7 +9,8 @@ OpenVINO Studio для macOS
    Если macOS пишет «повреждено» или ничего не происходит, выполните в Терминале:
    xattr -dr com.apple.quarantine "/путь/к/OpenVINO Studio/launchers/macos/OpenVINO Studio.app"
 3. Нужен Python 3.10–3.14 с python.org или Homebrew. Проверка: python3 --version.
-4. Приложение работает локально и открывает интерфейс в браузере.
+4. Интерфейс открывается во встроенном окне Qt WebEngine (Chromium), браузер не нужен.
+   Если окно не открылось, появится сообщение с адресом и журналом.
    Если окно не появилось, смотрите runtime/logs/bootstrap.log и macos-launcher.log.
 
 Все данные хранятся рядом с папкой проекта (runtime/ и models/).
